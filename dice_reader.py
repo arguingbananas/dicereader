@@ -76,9 +76,9 @@ def overlay_info(frame, dice, blobs):
 
 
 # Initialize a video feed
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
-scale = 20
+scale = 15
 
 while True:
     # Grab the latest image from the video feed
@@ -101,16 +101,30 @@ while True:
 
     res = cv2.waitKey(1)
 
-    # Zoom in if user presses "a"
+    # Zoom in by 5's if user presses "a"
     if res & 0xFF == ord("a"):
-        if scale < 100:
-            scale += 5  # +5
-            print(scale)
-    # Zoom out if user presses "z"
-    if res & 0xFF == ord("z"):
         if scale > 5:
             scale -= 5  # -5
             print(scale)
+    # Zoom out by 5's if user presses "z"
+    if res & 0xFF == ord("z"):
+        if scale < 50:
+            scale += 5  # +5
+            print(scale)
+    # Zoom in by 1's if user presses "a"
+    if res & 0xFF == ord("s"):
+        if scale > 5:
+            scale -= 1  # -1
+            print(scale)
+    # Zoom out by 1's if user presses "z"
+    if res & 0xFF == ord("x"):
+        if scale < 50:
+            scale += 1  # +1
+            print(scale)
+    # Reset zoom to default if user presses "t"
+    if res & 0xFF == ord("t"):
+        scale = 15
+        print(scale)
     # Stop if the user presses "q"
     if res & 0xFF == ord("q"):
         break
