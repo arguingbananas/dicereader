@@ -103,22 +103,22 @@ while True:
 
     # Zoom in by 5's if user presses "a"
     if res & 0xFF == ord("a"):
-        if scale > 5:
+        if (scale - 5) >= 5:
             scale -= 5  # -5
             print(scale)
     # Zoom out by 5's if user presses "z"
     if res & 0xFF == ord("z"):
-        if scale < 50:
+        if (scale + 5) <= 50:
             scale += 5  # +5
             print(scale)
     # Zoom in by 1's if user presses "a"
     if res & 0xFF == ord("s"):
-        if scale > 5:
+        if (scale - 1) >= 5:
             scale -= 1  # -1
             print(scale)
     # Zoom out by 1's if user presses "z"
     if res & 0xFF == ord("x"):
-        if scale < 50:
+        if (scale + 1) <= 50:
             scale += 1  # +1
             print(scale)
     # Reset zoom to default if user presses "t"
