@@ -78,12 +78,14 @@ def overlay_info(frame, dice, blobs):
 # Initialize a video feed
 cap = cv2.VideoCapture(0)
 
+# Initial zoom percentage
 scale = 15
 
 while True:
     # Grab the latest image from the video feed
     ret, frame = cap.read()
 
+    # Borrowed from https://stackoverflow.com/questions/50870405/how-can-i-zoom-my-webcam-in-open-cv-python
     height, width, channels = frame.shape
     centerX, centerY = int(height / 2), int(width / 2)
     radiusX, radiusY = int(scale * height / 100), int(scale * width / 100)
@@ -97,8 +99,9 @@ while True:
     dice = get_dice_from_blobs(blobs)
     out_frame = overlay_info(resized_cropped, dice, blobs)
 
-    cv2.imshow("frame", resized_cropped)
+    cv2.imshow("Dice", resized_cropped)
 
+    # Track zoom changes
     old_scale = scale
 
     res = cv2.waitKey(1)
