@@ -30,8 +30,7 @@ def get_dice_from_blobs(blobs):
     X = np.asarray(X)
 
     if len(X) > 0:
-        # Important to set min_sample to 0, as a dice may only have one dot
-        clustering = cluster.DBSCAN(eps=40, min_samples=0).fit(X)
+        clustering = cluster.DBSCAN(eps=40, min_samples=1).fit(X)
 
         # Find the largest label assigned + 1, that's the number of dice found
         num_dice = max(clustering.labels_) + 1
@@ -58,40 +57,62 @@ def overlay_info(frame, dice, blobs):
         pos = b.pt
         r = b.size / 2
 
-        cv2.circle(frame, (int(pos[0]), int(pos[1])),
-                   int(r), (255, 0, 0), 2)
+        cv2.circle(frame, (int(pos[0]), int(pos[1])), int(r), (0, 0, 0), -1)
 
     # Overlay dice number
     for d in dice:
         # Get textsize for text centering
-        textsize = cv2.getTextSize(
-            str(d[0]), cv2.FONT_HERSHEY_PLAIN, 3, 2)[0]
+        textsize = cv2.getTextSize(str(d[0]), cv2.FONT_HERSHEY_PLAIN, 3, 2)[0]
 
-        cv2.putText(frame, str(d[0]),
-                    (int(d[1] - textsize[0] / 2),
-                     int(d[2] + textsize[1] / 2)),
-                    cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 2)
+        cv2.putText(
+            frame,
+            str(d[0]),
+            (int(d[1] - textsize[0] / 2), int(d[2] + textsize[1] / 2)),
+            cv2.FONT_HERSHEY_PLAIN,
+            3,
+            (0, 0, 255),
+            4,
+        )
 
 
 # Initialize a video feed
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2)
 
+scale = 20
 
-while(True):
+while True:
     # Grab the latest image from the video feed
     ret, frame = cap.read()
 
-    # We'll define these later
-    blobs = get_blobs(frame)
-    dice = get_dice_from_blobs(blobs)
-    out_frame = overlay_info(frame, dice, blobs)
+    height, width, channels = frame.shape
+    centerX, centerY = int(height / 2), int(width / 2)
+    radiusX, radiusY = int(scale * height / 100), int(scale * width / 100)
+    minX, maxX = centerX - radiusX, centerX + radiusX
+    minY, maxY = centerY - radiusY, centerY + radiusY
+    cropped = frame[minX:maxX, minY:maxY]
+    resized_cropped = cv2.resize(cropped, (width, height))
 
-    cv2.imshow("frame", frame)
+    # We'll define these later
+    blobs = get_blobs(resized_cropped)
+    dice = get_dice_from_blobs(blobs)
+    out_frame = overlay_info(resized_cropped, dice, blobs)
+
+    cv2.imshow("frame", resized_cropped)
 
     res = cv2.waitKey(1)
 
+    # Zoom in if user presses "a"
+    if res & 0xFF == ord("a"):
+        if scale < 100:
+            scale += 5  # +5
+            print(scale)
+    # Zoom out if user presses "z"
+    if res & 0xFF == ord("z"):
+        if scale > 5:
+            scale -= 5  # -5
+            print(scale)
     # Stop if the user presses "q"
-    if res & 0xFF == ord('q'):
+    if res & 0xFF == ord("q"):
         break
 
 # When everything is done, release the capture
