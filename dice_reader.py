@@ -118,13 +118,13 @@ while True:
             scale += 5  # +5
         else:
             scale = 50
-    # Zoom in by 1's if user presses "a"
+    # Zoom in by 1's if user presses "s"
     if res & 0xFF == ord("s"):
         if (scale - 1) >= 5:
             scale -= 1  # -1
         else:
             scale = 5
-    # Zoom out by 1's if user presses "z"
+    # Zoom out by 1's if user presses "x"
     if res & 0xFF == ord("x"):
         if (scale + 1) <= 50:
             scale += 1  # +1
