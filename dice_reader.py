@@ -11,9 +11,10 @@ detector = cv2.SimpleBlobDetector_create(params)
 
 
 def get_blobs(frame):
-    frame_blurred = cv2.medianBlur(frame, 7)
-    frame_gray = cv2.cvtColor(frame_blurred, cv2.COLOR_BGR2GRAY)
-    blobs = detector.detect(frame_gray)
+
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    frame_blurred = cv2.GaussianBlur(frame_gray, (5, 5), 0)
+    blobs = detector.detect(frame_blurred)
 
     return blobs
 
@@ -78,13 +79,18 @@ def overlay_info(frame, dice, blobs):
 # Initialize a video feed
 cap = cv2.VideoCapture(0)
 
+DEFAULTSCALE = 30
+MINDEFAULTSCALE = 10
+
 # Initial zoom percentage
-scale = 15
+scale = DEFAULTSCALE
 
 while True:
+
     # Grab the latest image from the video feed
     ret, frame = cap.read()
 
+    # Crop image
     # Borrowed from https://stackoverflow.com/questions/50870405/how-can-i-zoom-my-webcam-in-open-cv-python
     height, width, channels = frame.shape
     centerX, centerY = int(height / 2), int(width / 2)
@@ -94,51 +100,25 @@ while True:
     cropped = frame[minX:maxX, minY:maxY]
     resized_cropped = cv2.resize(cropped, (width, height))
 
-    # We'll define these later
+    # main()
     blobs = get_blobs(resized_cropped)
     dice = get_dice_from_blobs(blobs)
+    # autozoom
+    if not dice:
+        scale = DEFAULTSCALE
+    else:
+        if (scale - 5) > MINDEFAULTSCALE:
+            scale -= 5
+
     out_frame = overlay_info(resized_cropped, dice, blobs)
 
     cv2.imshow("Dice", resized_cropped)
 
-    # Track zoom changes
-    old_scale = scale
-
     res = cv2.waitKey(1)
 
-    # Zoom in by 5's if user presses "a"
-    if res & 0xFF == ord("a"):
-        if (scale - 5) >= 5:
-            scale -= 5  # -5
-        else:
-            scale = 5
-    # Zoom out by 5's if user presses "z"
-    if res & 0xFF == ord("z"):
-        if (scale + 5) <= 50:
-            scale += 5  # +5
-        else:
-            scale = 50
-    # Zoom in by 1's if user presses "s"
-    if res & 0xFF == ord("s"):
-        if (scale - 1) >= 5:
-            scale -= 1  # -1
-        else:
-            scale = 5
-    # Zoom out by 1's if user presses "x"
-    if res & 0xFF == ord("x"):
-        if (scale + 1) <= 50:
-            scale += 1  # +1
-        else:
-            scale = 50
-    # Reset zoom to default if user presses "t"
-    if res & 0xFF == ord("t"):
-        scale = 15
     # Stop if the user presses "q"
     if res & 0xFF == ord("q"):
         break
-
-    if old_scale != scale:
-        print(scale)
 
 # When everything is done, release the capture
 cap.release()
