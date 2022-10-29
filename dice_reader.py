@@ -11,10 +11,10 @@ detector = cv2.SimpleBlobDetector_create(params)
 
 
 def get_blobs(frame):
-
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    frame_blurred = cv2.GaussianBlur(frame_gray, (5, 5), 0)
-    blobs = detector.detect(frame_blurred)
+    frame_blurred = cv2.GaussianBlur(frame, (5, 5), 0)
+    frame_gray = cv2.cvtColor(frame_blurred, cv2.COLOR_BGR2GRAY)
+    
+    blobs = detector.detect(frame_gray)
 
     return blobs
 
