@@ -116,6 +116,14 @@ while True:
 
     res = cv2.waitKey(1)
 
+    # Zoom in if the user presses "s"
+    if res & 0xFF == ord("s"):
+        if (scale - 0.5) > MINDEFAULTSCALE:
+            scale -= 0.5
+    # Zoom out if the user presses "x"
+    if res & 0xFF == ord("x"):
+        if (scale + 0.5) < DEFAULTSCALE:
+            scale += 0.5
     # Stop if the user presses "q"
     if res & 0xFF == ord("q"):
         break
