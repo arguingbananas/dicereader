@@ -12,13 +12,15 @@ while True:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Apply blur to reduce high frequency noise
-    blur = cv2.GaussianBlur(gray, (5,5), 0)
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
 
     # Use Canny edge detection to identify edges in the image
     edges = cv2.Canny(blur, 50, 150)
 
     # Use Hough transform to detect circles in the image
-    circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+    circles = cv2.HoughCircles(
+        edges, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0
+    )
 
     # Make sure circles were detected
     if circles is not None:
@@ -31,7 +33,7 @@ while True:
             cv2.circle(frame, (x, y), r, (0, 255, 0), 4)
 
             # Crop image to just the dice
-            dice = frame[y-r:y+r, x-r:x+r]
+            dice = frame[y - r : y + r, x - r : x + r]
 
             # Use template matching to identify the value of the dice
             result = cv2.matchTemplate(dice, template, cv2.TM_CCOEFF_NORMED)
@@ -39,7 +41,15 @@ while True:
 
             # If the match is strong enough, display the value of the dice on the image
             if maxVal > 0.8:
-                cv2.putText(frame, str(value), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
+                cv2.putText(
+                    frame,
+                    str(value),
+                    (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1.0,
+                    (255, 255, 255),
+                    2,
+                )
 
     # Display the resulting image
     cv2.imshow("Dice Tracking", frame)
