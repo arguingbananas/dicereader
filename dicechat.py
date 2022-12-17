@@ -4,6 +4,9 @@ import numpy as np
 # Capture image or video from camera
 cap = cv2.VideoCapture(0)
 
+# Read in the template image
+template = cv2.imread("template.png")
+
 while True:
     # Read frame from camera
     ret, frame = cap.read()
