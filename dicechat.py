@@ -4,8 +4,13 @@ import numpy as np
 # Capture image or video from camera
 cap = cv2.VideoCapture(0)
 
-# Read in the template image
-template = cv2.imread("template.png")
+# Load the template images for each dice value
+template_1 = cv2.imread("dice_1.jpg", 0)
+template_2 = cv2.imread("dice_2.jpg", 0)
+template_3 = cv2.imread("dice_3.jpg", 0)
+template_4 = cv2.imread("dice_4.jpg", 0)
+template_5 = cv2.imread("dice_5.jpg", 0)
+template_6 = cv2.imread("dice_6.jpg")
 
 while True:
     # Read frame from camera
@@ -39,7 +44,7 @@ while True:
             dice = frame[y - r : y + r, x - r : x + r]
 
             # Use template matching to identify the value of the dice
-            result = cv2.matchTemplate(dice, template, cv2.TM_CCOEFF_NORMED)
+            result = cv2.matchTemplate(dice, template_6, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
 
             # If the match is strong enough, display the value of the dice on the image
